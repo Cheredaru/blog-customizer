@@ -3,9 +3,11 @@
 	left: 0;
 	width: 616px;
 	height: 100%;
-	overflow: scroll;
+	overflow: hidden;
 	transform: translate(-616px);
 	transition: transform 0.5s ease;
+	font-family: 'Open Sans';
+	z-index: 100;
 }
 
 .container_open {
@@ -23,6 +25,7 @@
 	padding: 50px 31px;
 	background-color: #ffffff;
 	border-right: 1px solid #000000;
+	gap: 50px;
 }
 
 .bottomContainer {
@@ -30,3 +33,18 @@
 	justify-content: space-between;
 	margin-top: auto;
 }
+
+.title{
+	font-size: 31px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.label{
+	font-size: 12px;
+	font-weight: 800;
+	text-transform: uppercase;
+	display: block;
+	margin-bottom: 4px;
+}
+
