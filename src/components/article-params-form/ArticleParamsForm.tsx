@@ -11,75 +11,53 @@ import {
 	contentWidthArr,
 	fontSizeOptions,
 	defaultArticleState,
-	ArticleStateType,
-	OptionType
+	ArticleStateType
 } from 'src/constants/articleProps';
 
 import styles from './ArticleParamsForm.module.scss';
 
 type ArticleParamsFormProps = {
-	initialParams: ArticleStateType;
 	onApply: (params: ArticleStateType) => void;
-	onReset: () => void;
-	isOpen?: boolean;
-	toggleOpen:() => void;
-}
+};
 
-export const ArticleParamsForm = ({
-	initialParams = defaultArticleState,
-	onApply,
-	onReset,
-	isOpen = false,
-	toggleOpen = () => {},
-}: ArticleParamsFormProps) => {
-	const [params, setParams] = useState<ArticleStateType>(initialParams);
+export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const [params, setParams] = useState<ArticleStateType>(defaultArticleState);
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
-			if (isOpen && sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
-				toggleOpen();
-			}
+			if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {setIsOpen(false);}
 		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return() => {
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
-	}, [isOpen, toggleOpen]);
+		if (isOpen) {document.addEventListener('mousedown', handleClickOutside);}
+		return() => {document.removeEventListener('mousedown', handleClickOutside);};
+	}, [isOpen]);
 
-	const handleFontFamilyChange = (option: OptionType) => {
-		setParams(prev => ({ ...prev, fontFamilyOption: option}));
-	};
-
-	const handleFontSizeChange = (option: OptionType) => {
-		setParams(prev => ({ ...prev, fontSizeOption: option}));
-	};
-
-	const handleFontColorChange = (option: OptionType) => {
-		setParams(prev => ({ ...prev, fontColor: option}));
-	};
-
-	const handleBackgroundColorChange = (option: OptionType) => {
-		setParams(prev => ({ ...prev, backgroundColor: option}));
-	};
-
-	const handleWidthChange = (option: OptionType) => {
-		setParams(prev => ({ ...prev, contentWidth: option}));
+	const handleParamsChange = <K extends keyof ArticleStateType> (
+		key: K,
+		value: ArticleStateType[K]
+	) => {
+		setParams(prev => ({ ...prev, [key]: value}));
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		onApply(params);
+		setIsOpen(false);
 	}
 
 	const handleReset = () => {
 		setParams(defaultArticleState);
-		onReset();
+		onApply(defaultArticleState);
+	}
+
+	const toggleSidebar = () => {
+		setIsOpen(prev => !prev);
 	}
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={toggleOpen} />
+			<ArrowButton isOpen={isOpen} onClick={toggleSidebar} />
 			<aside
 				ref={sidebarRef}
 				className={`${styles.container} ${isOpen ? styles.container_open : ''}`}>
@@ -91,7 +69,7 @@ export const ArticleParamsForm = ({
 						<Select
 							options={fontFamilyOptions}
 							selected={params.fontFamilyOption}
-							onChange={handleFontFamilyChange}
+							onChange={(option) => handleParamsChange('fontFamilyOption', option)}
 							placeholder='Выберите шрифт'
 						/>
 					</div>
@@ -102,7 +80,7 @@ export const ArticleParamsForm = ({
 							title="Размер шрифта:"
 							options={fontSizeOptions}
 							selected={params.fontSizeOption}
-							onChange={handleFontSizeChange}
+							onChange={(option) => handleParamsChange('fontSizeOption', option)}
 						/>
 					</div>
 
@@ -111,7 +89,7 @@ export const ArticleParamsForm = ({
 						<Select
 							options={fontColors}
 							selected={params.fontColor}
-							onChange={handleFontColorChange}
+							onChange={(option) => handleParamsChange('fontColor', option)}
 							placeholder='Выберите цвет шрифта'
 						/>
 					</div>
@@ -123,7 +101,7 @@ export const ArticleParamsForm = ({
 						<Select
 							options={backgroundColors}
 							selected={params.backgroundColor}
-							onChange={handleBackgroundColorChange}
+							onChange={(option) => handleParamsChange('backgroundColor', option)}
 							placeholder='Выберите цвет фона'
 						/>
 					</div>
@@ -133,7 +111,7 @@ export const ArticleParamsForm = ({
 						<Select
 							options={contentWidthArr}
 							selected={params.contentWidth}
-							onChange={handleWidthChange}
+							onChange={(option) => handleParamsChange('contentWidth', option)}
 							placeholder='Выберите ширину контента'
 						/>
 					</div>
